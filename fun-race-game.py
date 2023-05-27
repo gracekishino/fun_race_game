@@ -23,15 +23,6 @@ class Player:
   def __repr__(self):
     return "{name} has a \"{footprint}\" footprint".format(name=self.name, footprint=self.footprint)
   
-  def show_position(self):
-    footprints = ""
-    for i in range(0,self.position):
-      footprints += self.footprint
-    for i in range(0,self.game.total_steps-self.position):
-      footprints += "→"
-    footprints += "✨ " + self.name
-    return footprints
-
   def set_footprint(self,footprint):
     formatted_fp = footprint.strip()
     if formatted_fp == "":
@@ -45,6 +36,15 @@ class Player:
     if formatted_name == "":
       formatted_name = "Player " + self.number
     return formatted_name
+  
+  def show_position(self):
+    footprints = ""
+    for i in range(0,self.position):
+      footprints += self.footprint
+    for i in range(0,self.game.total_steps-self.position):
+      footprints += "→"
+    footprints += "✨ " + self.name
+    return footprints
 
 class Game:
   def __init__(self,name="Fun Race Game",steps=25):
@@ -57,18 +57,51 @@ class Game:
   
   def __repr__(self):
     return "\n{name} has {steps} steps! \n\nThe aim is for BOTH players to reach \nthe goal in as few gos as possible. 💖💖 \n".format(name=self.name, steps=self.total_steps)
-
+  
+  # show player positions in the race
   def player_positions(self):
     player_positions = "\n"
     for player in self.players:
       player_positions += player.show_position() + "\n"
     return player_positions
-
+  
+  # description of players' footprints
   def player_footprints(self):
     player_footprints = "\n"
     for player in self.players:
       player_footprints += player.__repr__() + "\n"
     return player_footprints
+  
+  # decide who starts
+  def who_starts(self):
+    random.shuffle(self.players)
+    return self.players[0].name 
+  
+  # player has a go 
+  def have_go(self, player):
+    # choice to roll dice (if still playing) or quit
+    if not self.finished and not self.quit and player.position < self.total_steps:
+      choice = input(player.name + ", it's your go! \nPress r to roll the dice, \nor q to quit the game: ")
+      while choice != 'r' and choice != 'q':
+        choice = input(player.name + ", it looks like you didn't choose 'r' or 'q'. Press r to roll the dice, or q to quit the game: ")
+      if choice == 'q':
+        self.quit = True
+      elif choice == 'r':
+        self.gos += 1
+        roll = random.randint(1,6)
+        print("\nYou rolled a " + str(roll) + "!")
+        player.position += roll
+        if player.position > self.total_steps:
+          player.position = self.total_steps
+        print(self.player_positions())
+
+    # check if game is finished
+    all_players_finished = True
+    for player in self.players:
+      if player.position < self.total_steps:
+        all_players_finished = False
+    if all_players_finished:
+      self.finished = True
 
   def play(self):
     # print game details
@@ -95,53 +128,24 @@ class Game:
     print(self.player_positions())
     print(self.who_starts() + " goes first!")
     
-    # players have gos until both the goal
+    # players have gos until both reach the goal
     while not self.finished and not self.quit:
       for player in self.players:
           self.have_go(player)
 
-    # end congrats message  
+    # end congrats message or quit 
     if self.finished:        
       print("\nCongratulations!!! \nCompleted in " + str(self.gos) + " gos ✨")
     else:
       print("Let's play again soon!")
 
-  # decide who starts
-  def who_starts(self):
-    random.shuffle(self.players)
-    return self.players[0].name 
-  
-  # player has a go 
-  def have_go(self, player):
-    if not self.finished and not self.quit and player.position < self.total_steps:
-      choice = input(player.name + ", it's your go! \nPress r to roll the dice, \nor q to quit the game: ")
-      while choice != 'r' and choice != 'q':
-        choice = input(player.name + ", it looks like you didn't choose 'r' or 'q'. Press r to roll the dice, or q to quit the game: ")
-    
-      if choice == 'q':
-        self.quit = True
-      elif choice == 'r':
-        self.gos += 1
-        roll = random.randint(1,6)
-        print("\nYou rolled a " + str(roll) + "!")
-        player.position += roll
-        if player.position > self.total_steps:
-          player.position = self.total_steps
-        print(self.player_positions())
 
-    # check if game is finished
-    all_players_finished = True
-    for player in self.players:
-      if player.position < self.total_steps:
-        all_players_finished = False
-    if all_players_finished:
-      self.finished = True
 
 # set up games
 game1 = Game()
 game2 = Game("Win Together Game",50)
 
-# Play games
+# play games
 game1.play()
 game2.play()
 
