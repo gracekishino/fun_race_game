@@ -7,7 +7,7 @@ I wanted to create a collaborative game so created a race where the aim is for t
 I really enjoyed coding, testing and then playing the game once it was finished. 
 
 Below are a few screenshots of a game in action. 
-Download the code if you’d like to play it! 🥰
+Download [fun-race-game.py](https://github.com/gracekishino/python_fun_race_game/blob/main/fun-race-game.py) if you’d like to play it! 🥰
 
 ## Game intro and setting up users
 
